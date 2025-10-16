@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-dark text-secondary font-sans antialiased;
+  }
+
+  a {
+    @apply text-secondary;
+  }
+}
+

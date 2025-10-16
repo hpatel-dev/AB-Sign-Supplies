@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --filament-sidebar-width: 18rem;
+}
+
+.fi-sidebar {
+    @apply bg-dark text-secondary;
+}
+
+.fi-sidebar-item-label,
+.fi-sidebar-item-icon {
+    @apply text-secondary;
+}
+
+.fi-sidebar-item:hover .fi-sidebar-item-label,
+.fi-sidebar-item:hover .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active .fi-sidebar-item-label,
+.fi-sidebar-item.fi-active .fi-sidebar-item-icon {
+    @apply text-secondary;
+}
+
+.fi-sidebar-item.fi-active,
+.fi-sidebar-item:hover {
+    @apply bg-primary/20;
+}
+
+.fi-topbar {
+    @apply bg-dark text-secondary border-b border-dark/70;
+}
+
+.fi-simple-main {
+    @apply bg-dark/5;
+}
+
+.fi-button.fi-accent {
+    @apply bg-primary text-secondary hover:bg-primary/90;
+}
+
+.fi-badge.fi-badge-accent {
+    @apply bg-primary text-secondary;
+}
+
+.fi-header-heading {
+    @apply text-dark;
+}
