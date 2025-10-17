@@ -1,48 +1,74 @@
+@import '../../vendor/filament/filament/resources/css/theme.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-    --filament-sidebar-width: 18rem;
+    --filament-primary-50:  #fee6e7;
+    --filament-primary-100: #fccfd0;
+    --filament-primary-200: #faa0a4;
+    --filament-primary-300: #f77179;
+    --filament-primary-400: #f5434d;
+    --filament-primary-500: #fe0002;
+    --filament-primary-600: #d50002;
+    --filament-primary-700: #ad0002;
+    --filament-primary-800: #850102;
+    --filament-primary-900: #5c0102;
+    --filament-primary-950: #3f0001;
+
+    --filament-info-500:    #0ea5e9;
+    --filament-success-500: #22c55e;
+    --filament-warning-500: #f59e0b;
+    --filament-danger-500:  #ef4444;
 }
 
-.fi-sidebar {
-    @apply bg-dark text-secondary;
-}
-
-.fi-sidebar-item-label,
-.fi-sidebar-item-icon {
-    @apply text-secondary;
-}
-
-.fi-sidebar-item:hover .fi-sidebar-item-label,
-.fi-sidebar-item:hover .fi-sidebar-item-icon,
-.fi-sidebar-item.fi-active .fi-sidebar-item-label,
-.fi-sidebar-item.fi-active .fi-sidebar-item-icon {
-    @apply text-secondary;
-}
-
-.fi-sidebar-item.fi-active,
-.fi-sidebar-item:hover {
-    @apply bg-primary/20;
+.fi-layout {
+    @apply bg-slate-900 text-slate-100;
 }
 
 .fi-topbar {
-    @apply bg-dark text-secondary border-b border-dark/70;
+    @apply bg-slate-900/90 backdrop-blur;
 }
 
-.fi-simple-main {
-    @apply bg-dark/5;
+.fi-sidebar {
+    @apply bg-slate-950 border-slate-800;
 }
 
-.fi-button.fi-accent {
-    @apply bg-primary text-secondary hover:bg-primary/90;
+.fi-sidebar-header {
+    @apply bg-slate-950/80 border-b border-slate-800;
 }
 
-.fi-badge.fi-badge-accent {
-    @apply bg-primary text-secondary;
+.fi-main {
+    @apply bg-slate-900;
 }
 
-.fi-header-heading {
-    @apply text-dark;
+.fi-card {
+    @apply border-slate-800 bg-slate-900/80;
+}
+
+.fi-stats-card {
+    @apply border-slate-800 bg-slate-900/80;
+}
+
+.fi-forms-field-wrapper,
+.fi-forms-section {
+    @apply bg-slate-900/80 border border-slate-800;
+}
+
+.fi-table {
+    @apply border border-slate-800;
+}
+
+.fi-table tr {
+    @apply border-b border-slate-800;
+}
+
+.fi-table th,
+.fi-table td {
+    @apply bg-transparent;
+}
+
+.fi-btn {
+    @apply uppercase tracking-wide;
 }

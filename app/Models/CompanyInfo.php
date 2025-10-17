@@ -16,6 +16,9 @@ class CompanyInfo extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'site_name',
+        'tagline',
+        'logo_path',
         'about_us',
         'contact_email',
         'contact_phone',

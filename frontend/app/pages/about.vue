@@ -1,5 +1,10 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
+import { computed } from 'vue'
+
 interface CompanyInfo {
+  site_name?: string | null
+  tagline?: string | null
+  logo_url?: string | null
   about_us: string
   contact_email: string
   contact_phone: string
@@ -8,11 +13,14 @@ interface CompanyInfo {
 }
 
 const { data: company, pending } = await useApiFetch<CompanyInfo>('/company')
+
+const siteName = computed(() => company.value?.site_name ?? 'AB Sign Supplies')
+const subtitle = computed(() => company.value?.tagline ?? 'Dedicated to signage professionals')
 </script>
 
 <template>
   <div class="mx-auto w-full max-w-5xl px-6 py-24">
-    <SectionHeading title="About AB Sign Supplies" subtitle="Dedicated to signage professionals" />
+    <SectionHeading :title="`About ${siteName}`" :subtitle="subtitle" />
 
     <div v-if="pending" class="mt-10 space-y-4">
       <div class="h-6 w-2/3 animate-pulse rounded bg-dark/40" />

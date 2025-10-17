@@ -12,7 +12,6 @@ interface ProductSupplier {
 interface ProductCardProps {
   id: number
   name: string
-  price: number | string
   description?: string | null
   image_url?: string | null
   category?: ProductCategory | null
@@ -21,25 +20,23 @@ interface ProductCardProps {
 }
 
 const props = defineProps<{ product: ProductCardProps }>()
-
-const formattedPrice = computed(() => {
-  const value = Number(props.product.price ?? 0)
-  return value ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value) : '—'
-})
 </script>
 
 <template>
-  <article class="group flex h-full flex-col overflow-hidden rounded-xl border border-secondary/20 bg-dark/60 shadow-xl shadow-black/10 transition hover:-translate-y-1 hover:border-primary/60 hover:shadow-primary/30">
+  <NuxtLink
+    :to="`/products/${product.id}`"
+    class="group flex h-full flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:border-primary/60 hover:shadow-lg"
+  >
     <div class="relative">
       <img
         :src="product.image_url || '/images/logo.png'"
         :alt="product.name"
-        class="h-56 w-full object-cover object-center transition group-hover:opacity-90"
+        class="h-56 w-full object-cover object-center transition group-hover:scale-[1.01]"
         loading="lazy"
       />
       <span
         v-if="product.is_featured"
-        class="absolute left-3 top-3 rounded-full bg-primary px-3 py-1 text-xs font-semibold uppercase tracking-wide text-secondary"
+        class="absolute left-3 top-3 rounded-full bg-primary px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white shadow"
       >
         Featured
       </span>
@@ -47,17 +44,14 @@ const formattedPrice = computed(() => {
     <div class="flex flex-1 flex-col gap-4 p-6">
       <div>
         <p class="text-xs uppercase tracking-wide text-secondary/60">{{ product.category?.name || 'Product' }}</p>
-        <h3 class="mt-1 text-xl font-semibold text-secondary">{{ product.name }}</h3>
+        <h3 class="mt-1 text-xl font-semibold text-secondary transition group-hover:text-primary">{{ product.name }}</h3>
       </div>
       <p class="line-clamp-3 text-sm text-secondary/70">
         {{ product.description || 'Versatile signage accessory ready to integrate with your next build.' }}
       </p>
-      <div class="mt-auto flex items-end justify-between">
-        <p class="text-lg font-semibold text-primary">{{ formattedPrice }}</p>
-        <span class="text-xs uppercase tracking-wide text-secondary/50">
-          {{ product.supplier?.name || 'AB Sign Supplies' }}
-        </span>
+      <div class="mt-auto text-xs uppercase tracking-wide text-secondary/50">
+        {{ product.supplier?.name || 'AB Sign Supplies' }}
       </div>
     </div>
-  </article>
+  </NuxtLink>
 </template>

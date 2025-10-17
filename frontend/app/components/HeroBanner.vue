@@ -32,7 +32,7 @@
       </div>
       <div class="relative w-full max-w-md rounded-xl border border-primary/30 bg-dark/80 p-6 shadow-xl shadow-primary/20">
         <div class="flex items-center gap-3">
-          <img src="/images/logo.png" alt="AB Sign Supplies" class="h-14 w-14 rounded border border-primary/50 bg-primary/20" />
+          <img src="/images/logo.jpg" alt="AB Sign Supplies" class="h-14 w-14 rounded border border-primary/50 bg-primary/20" />
           <div>
             <p class="text-lg font-semibold text-secondary">Quality. Reliability. Speed.</p>
             <p class="text-sm text-secondary/70">Supplying signage professionals since 1998.</p>

@@ -41,4 +41,11 @@ class ProductController extends Controller
             $query->paginate($perPage)->withQueryString()
         );
     }
+
+    public function show(Product $product): ProductResource
+    {
+        $product->load(['category', 'supplier']);
+
+        return new ProductResource($product);
+    }
 }

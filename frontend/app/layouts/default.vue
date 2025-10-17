@@ -1,4 +1,7 @@
 ﻿<script setup lang="ts">
+import { computed, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
+
 const navigationLinks = [
   { name: 'Home', to: '/' },
   { name: 'Products', to: '/products' },
@@ -11,6 +14,18 @@ const mobileMenuOpen = ref(false)
 const currentYear = new Date().getFullYear()
 const route = useRoute()
 
+interface CompanyInfo {
+  site_name?: string | null
+  tagline?: string | null
+  logo_url?: string | null
+}
+
+const { data: companyInfo } = await useApiFetch<CompanyInfo>('/company')
+
+const siteName = computed(() => companyInfo.value?.site_name ?? 'AB Sign Supplies')
+const tagline = computed(() => companyInfo.value?.tagline ?? 'Your complete source for signage supplies')
+const logoUrl = computed(() => companyInfo.value?.logo_url ?? '/images/logo.png')
+
 watch(
   () => route.fullPath,
   () => {
@@ -20,14 +35,14 @@ watch(
 </script>
 
 <template>
-  <div class="flex min-h-screen flex-col bg-dark text-secondary">
-    <header class="border-b border-dark/60 bg-dark/95 backdrop-blur">
+  <div class="flex min-h-screen flex-col bg-white text-secondary">
+    <header class="border-b border-gray-200 bg-white/90 backdrop-blur">
       <div class="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-5">
         <NuxtLink to="/" class="flex items-center gap-3">
-          <img src="/images/logo.png" alt="AB Sign Supplies" class="h-12 w-12 rounded border border-primary/50 bg-primary/10" />
+          <img :src="logoUrl" :alt="siteName" class="h-12 w-12 rounded border border-primary/20 bg-primary/10 object-cover" />
           <div class="text-left">
-            <p class="text-lg font-semibold text-secondary">AB Sign Supplies</p>
-            <p class="text-sm text-secondary/70">Your complete source for signage supplies</p>
+            <p class="text-lg font-semibold text-secondary">{{ siteName }}</p>
+            <p class="text-sm text-secondary/70">{{ tagline }}</p>
           </div>
         </NuxtLink>
 
@@ -75,7 +90,7 @@ watch(
       </div>
 
       <transition name="fade">
-        <nav v-if="mobileMenuOpen" class="border-t border-dark/60 bg-dark/98 px-6 pb-6 lg:hidden">
+        <nav v-if="mobileMenuOpen" class="border-t border-gray-200 bg-white px-6 pb-6 lg:hidden">
           <div class="flex flex-col gap-3 pt-4">
             <NuxtLink
               v-for="link in navigationLinks"
@@ -95,11 +110,11 @@ watch(
       <slot />
     </main>
 
-    <footer class="mt-12 bg-dark/95">
+    <footer class="mt-12 border-t border-gray-200 bg-gray-50">
       <div class="mx-auto w-full max-w-7xl px-6 py-10 text-sm text-secondary/70">
         <div class="flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
           <div>
-            <p class="text-secondary">AB Sign Supplies</p>
+            <p class="text-secondary">{{ siteName }}</p>
             <p>&copy; {{ currentYear }} All rights reserved.</p>
           </div>
           <div class="flex gap-6">

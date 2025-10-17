@@ -13,8 +13,8 @@ const config: Config = {
     extend: {
       colors: {
         primary: '#FE0002',
-        secondary: '#FFFFFF',
-        dark: '#171E28',
+        secondary: '#1F2937',
+        dark: '#F8FAFC',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],

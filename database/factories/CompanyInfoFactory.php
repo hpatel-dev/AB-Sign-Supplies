@@ -17,6 +17,9 @@ class CompanyInfoFactory extends Factory
     public function definition(): array
     {
         return [
+            'site_name' => $this->faker->company(),
+            'tagline' => $this->faker->catchPhrase(),
+            'logo_path' => null,
             'about_us' => collect($this->faker->paragraphs(3))
                 ->map(fn (string $paragraph) => "<p>{$paragraph}</p>")
                 ->implode(''),

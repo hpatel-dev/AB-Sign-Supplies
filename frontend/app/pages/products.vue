@@ -12,7 +12,6 @@ interface ProductSupplier {
 interface Product {
   id: number
   name: string
-  price: number
   description?: string | null
   image_url?: string | null
   category?: ProductCategory | null
@@ -106,7 +105,7 @@ const goToPage = (page: number) => {
   <div class="mx-auto w-full max-w-7xl px-6 py-24">
     <SectionHeading title="Products" subtitle="Browse our full catalog" />
 
-    <div class="mt-10 flex flex-col gap-6 rounded-xl border border-secondary/20 bg-dark/70 p-6 lg:flex-row lg:items-end lg:justify-between">
+    <div class="mt-10 flex flex-col gap-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm lg:flex-row lg:items-end lg:justify-between">
       <div class="flex flex-1 flex-col gap-3">
         <label class="text-sm font-semibold text-secondary/70" for="search">Search</label>
         <input
@@ -114,7 +113,7 @@ const goToPage = (page: number) => {
           v-model="search"
           type="search"
           placeholder="Find vinyl, hardware, lighting, and more"
-          class="w-full rounded-md border border-secondary/30 bg-dark/60 px-4 py-3 text-secondary placeholder:text-secondary/40 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/60"
+          class="w-full rounded-md border border-gray-200 bg-white px-4 py-3 text-secondary placeholder:text-secondary/40 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
         />
       </div>
       <div class="flex w-full flex-col gap-3 lg:w-64">
@@ -122,7 +121,7 @@ const goToPage = (page: number) => {
         <select
           id="category"
           v-model="selectedCategory"
-          class="rounded-md border border-secondary/30 bg-dark/60 px-4 py-3 text-secondary focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/60"
+          class="rounded-md border border-gray-200 bg-white px-4 py-3 text-secondary focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
         >
           <option value="">All categories</option>
           <option v-for="category in categories || []" :key="category.id" :value="category.id">
@@ -134,14 +133,13 @@ const goToPage = (page: number) => {
 
     <div class="mt-12">
       <p v-if="products?.meta" class="text-sm text-secondary/60">
-      <p v-if="products?.meta" class="text-sm text-secondary/60">
-        Showing page {{ products.meta.current_page }} of {{ products.meta.last_page }} — {{ products.meta.total }} items total
-
+        Showing page {{ products.meta.current_page }} of {{ products.meta.last_page }} - {{ products.meta.total }} items total
+      </p>
       <div v-if="pending" class="mt-6 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-        <div v-for="index in 12" :key="index" class="animate-pulse rounded-xl border border-secondary/20 bg-dark/60 p-6">
-          <div class="mb-4 h-40 rounded-lg bg-dark/40" />
-          <div class="mb-2 h-6 w-3/4 rounded bg-dark/30" />
-          <div class="h-4 w-full rounded bg-dark/20" />
+        <div v-for="index in 12" :key="index" class="animate-pulse rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div class="mb-4 h-40 rounded-lg bg-gray-200" />
+          <div class="mb-2 h-6 w-3/4 rounded bg-gray-200" />
+          <div class="h-4 w-full rounded bg-gray-100" />
         </div>
       </div>
 
@@ -152,14 +150,14 @@ const goToPage = (page: number) => {
         <ProductCard v-for="product in products.data" :key="product.id" :product="product" />
       </div>
 
-      <div v-else class="mt-6 rounded-xl border border-secondary/20 bg-dark/60 p-10 text-center text-secondary/80">
+      <div v-else class="mt-6 rounded-xl border border-gray-200 bg-white p-10 text-center text-secondary/80 shadow-sm">
         <p>No products matched your filters. Try adjusting your search or category.</p>
       </div>
     </div>
 
     <div v-if="maxPage > 1" class="mt-12 flex flex-wrap items-center justify-center gap-4">
       <button
-        class="rounded-md border border-secondary/30 px-4 py-2 text-sm text-secondary transition hover:border-primary"
+        class="rounded-md border border-gray-200 px-4 py-2 text-sm text-secondary transition hover:border-primary hover:text-primary"
         :disabled="currentPage === 1"
         :class="{ 'cursor-not-allowed opacity-40': currentPage === 1 }"
         type="button"
@@ -171,7 +169,7 @@ const goToPage = (page: number) => {
         Page {{ currentPage }} of {{ maxPage }}
       </div>
       <button
-        class="rounded-md border border-secondary/30 px-4 py-2 text-sm text-secondary transition hover:border-primary"
+        class="rounded-md border border-gray-200 px-4 py-2 text-sm text-secondary transition hover:border-primary hover:text-primary"
         :disabled="currentPage === maxPage"
         :class="{ 'cursor-not-allowed opacity-40': currentPage === maxPage }"
         type="button"

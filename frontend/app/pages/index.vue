@@ -14,7 +14,6 @@ interface ProductSupplier {
 interface Product {
   id: number;
   name: string;
-  price: number;
   description?: string | null;
   image_url?: string | null;
   category?: ProductCategory | null;
@@ -45,10 +44,10 @@ const { data: featuredProducts, pending } = await useApiFetch<ApiCollection<Prod
 
       <div class="mt-12">
         <div v-if="pending" class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          <div v-for="index in 6" :key="index" class="animate-pulse rounded-xl border border-secondary/20 bg-dark/60 p-6">
-            <div class="mb-4 h-40 rounded-lg bg-dark/40" />
-            <div class="mb-2 h-6 w-3/4 rounded bg-dark/30" />
-            <div class="h-4 w-full rounded bg-dark/20" />
+          <div v-for="index in 6" :key="index" class="animate-pulse rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+            <div class="mb-4 h-40 rounded-lg bg-gray-200" />
+            <div class="mb-2 h-6 w-3/4 rounded bg-gray-200" />
+            <div class="h-4 w-full rounded bg-gray-100" />
           </div>
         </div>
 
@@ -63,7 +62,7 @@ const { data: featuredProducts, pending } = await useApiFetch<ApiCollection<Prod
           />
         </div>
 
-        <div v-else class="rounded-xl border border-secondary/20 bg-dark/60 p-10 text-center text-secondary/80">
+        <div v-else class="rounded-xl border border-gray-200 bg-white p-10 text-center text-secondary/80 shadow-sm">
           <p>No featured products are currently available. Please check back soon.</p>
         </div>
 
@@ -78,21 +77,21 @@ const { data: featuredProducts, pending } = await useApiFetch<ApiCollection<Prod
       </div>
     </section>
 
-    <section class="bg-dark/80">
+    <section class="bg-gray-100">
       <div class="mx-auto grid w-full max-w-7xl gap-12 px-6 py-20 lg:grid-cols-3">
-        <div class="rounded-xl border border-primary/30 bg-dark/70 p-8 shadow-lg shadow-primary/10">
+        <div class="rounded-xl border border-primary/30 bg-white p-8 shadow-lg shadow-primary/10">
           <h3 class="text-xl font-semibold text-secondary">Premium Materials</h3>
           <p class="mt-3 text-secondary/70">
             From vinyl and acrylics to electrical components, we source reliable materials from trusted brands.
           </p>
         </div>
-        <div class="rounded-xl border border-primary/30 bg-dark/70 p-8 shadow-lg shadow-primary/10">
+        <div class="rounded-xl border border-primary/30 bg-white p-8 shadow-lg shadow-primary/10">
           <h3 class="text-xl font-semibold text-secondary">Industry Expertise</h3>
           <p class="mt-3 text-secondary/70">
             Lean on our specialists for product recommendations and installation best practices for any project.
           </p>
         </div>
-        <div class="rounded-xl border border-primary/30 bg-dark/70 p-8 shadow-lg shadow-primary/10">
+        <div class="rounded-xl border border-primary/30 bg-white p-8 shadow-lg shadow-primary/10">
           <h3 class="text-xl font-semibold text-secondary">Rapid Fulfillment</h3>
           <p class="mt-3 text-secondary/70">
             Nationwide distribution centers and dedicated logistics ensure you meet tight production schedules.
