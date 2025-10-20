@@ -1,14 +1,27 @@
-import type { UseFetchOptions } from 'nuxt/app';
+﻿import { useFetch, useRuntimeConfig } from '#imports';
+import type { AsyncData, UseFetchOptions } from 'nuxt/app';
+import type { FetchError } from 'ofetch';
 
-export const useApiFetch = <T>(path: string, options: UseFetchOptions<T> = {}) => {
+type MaybeComputedPath = string | (() => string);
+
+export const useApiFetch = <T>(path: MaybeComputedPath, options: UseFetchOptions<T> = {}): AsyncData<T, FetchError<T>> => {
   const config = useRuntimeConfig();
-  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
 
-  return useFetch<T>(`${config.public.apiBase}${normalizedPath}`, {
+  const resolvePath = () => {
+    const raw = typeof path === 'function' ? path() : path;
+    return raw.startsWith('/') ? raw : `/${raw}`;
+  };
+
+  const headers: HeadersInit = {
+    accept: 'application/json',
+    ...(options.headers as Record<string, string> | undefined),
+  };
+
+  const fetchOptions = {
     ...options,
-    headers: {
-      accept: 'application/json',
-      ...(options.headers ?? {}),
-    },
-  });
+    baseURL: config.public.apiBase,
+    headers,
+  } as UseFetchOptions<T>;
+
+  return useFetch<T>(resolvePath as any, fetchOptions as any) as AsyncData<T, FetchError<T>>;
 };

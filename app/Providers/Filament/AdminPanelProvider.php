@@ -29,7 +29,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->brandName('AB Sign Supplies')
-            ->brandLogo(asset('images/logo.jpg'))
+            ->brandLogo(asset('images/logo.svg'))
             ->colors([
                 'primary' => Color::hex('#FE0002'),
             ])

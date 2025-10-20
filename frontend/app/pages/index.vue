@@ -1,5 +1,5 @@
 ﻿<script setup lang="ts">
-import type { AsyncData } from 'nuxt/app';
+import { computed, watch } from 'vue';
 
 interface ProductCategory {
   id: number;
@@ -27,12 +27,38 @@ interface ApiCollection<T> {
   meta?: Record<string, unknown>;
 }
 
-const { data: featuredProducts, pending } = await useApiFetch<ApiCollection<Product>>('/products', {
+const featuredProductsResponse = useApiFetch<ApiCollection<Product>>('/products', {
   query: {
     featured: true,
     per_page: 6,
   },
 });
+
+const featuredProducts = computed<ApiCollection<Product> | null>(() => featuredProductsResponse.data.value ?? null);
+const pending = featuredProductsResponse.pending;
+const productList = computed(() => featuredProducts.value?.data ?? []);
+
+const { apply: applySeo } = useSeo({ slug: 'home' });
+
+watch(
+  productList,
+  (products) => {
+    const productWithImage = products.find((item) => item.image_url);
+
+    if (productWithImage?.image_url) {
+      applySeo({
+        openGraph: {
+          imageUrl: productWithImage.image_url,
+        },
+        twitter: {
+          imageUrl: productWithImage.image_url,
+          card: 'summary_large_image',
+        },
+      });
+    }
+  },
+  { immediate: true },
+);
 </script>
 
 <template>
@@ -101,3 +127,5 @@ const { data: featuredProducts, pending } = await useApiFetch<ApiCollection<Prod
     </section>
   </div>
 </template>
+
+

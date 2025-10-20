@@ -83,15 +83,18 @@ watch(
   { deep: true },
 )
 
-const { data: categories } = await useApiFetch<ProductCategory[]>('/categories')
+const categoriesResponse = useApiFetch<ProductCategory[]>('/categories')
+const categories = computed<ProductCategory[]>(() => categoriesResponse.data.value ?? [])
 
-const {
-  data: products,
-  pending,
-} = await useApiFetch<ApiCollection<Product>>('/products', {
+const productsResponse = useApiFetch<ApiCollection<Product>>('/products', {
   query: queryParams,
   watch: [queryParams],
 })
+
+const products = computed<ApiCollection<Product> | null>(() => productsResponse.data.value ?? null)
+const pending = productsResponse.pending
+
+const { apply: applySeo, reset: resetSeo } = useSeo({ slug: 'products' })
 
 const maxPage = computed(() => products.value?.meta?.last_page ?? 1)
 
@@ -99,6 +102,37 @@ const goToPage = (page: number) => {
   if (page < 1 || page > maxPage.value || page === currentPage.value) return
   currentPage.value = page
 }
+
+watch([search, selectedCategory, () => categories.value], ([searchTerm, categoryId, categoryList]) => {
+    const details: string[] = []
+
+    if (searchTerm) {
+      details.push(`matching "${searchTerm}"`)
+    }
+
+    if (categoryId) {
+      const category = categoryList?.find(item => String(item.id) === String(categoryId))
+
+      if (category?.name) {
+        details.push(`within ${category.name}`)
+      }
+    }
+
+    if (!details.length) {
+      resetSeo()
+      return
+    }
+
+    const description = `Browse signage products ${details.join(' ')}.`
+
+    applySeo({
+      description,
+      openGraph: { description },
+      twitter: { description },
+    })
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
@@ -124,7 +158,7 @@ const goToPage = (page: number) => {
           class="rounded-md border border-gray-200 bg-white px-4 py-3 text-secondary focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
         >
           <option value="">All categories</option>
-          <option v-for="category in categories || []" :key="category.id" :value="category.id">
+          <option v-for="category in categories" :key="category.id" :value="category.id">
             {{ category.name }}
           </option>
         </select>
@@ -180,3 +214,8 @@ const goToPage = (page: number) => {
     </div>
   </div>
 </template>
+
+
+
+
+

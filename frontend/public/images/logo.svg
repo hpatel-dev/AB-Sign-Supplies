@@ -1,0 +1,13 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FE0002" />
+      <stop offset="100%" stop-color="#5C0001" />
+    </linearGradient>
+  </defs>
+  <rect width="160" height="160" rx="24" fill="url(#grad)" />
+  <g fill="#FFFFFF" font-family="'Segoe UI', Arial, sans-serif" font-weight="700" text-anchor="middle">
+    <text x="50%" y="55%" font-size="64" letter-spacing="2">AB</text>
+    <text x="50%" y="78%" font-size="20" letter-spacing="4">SIGN</text>
+  </g>
+</svg>

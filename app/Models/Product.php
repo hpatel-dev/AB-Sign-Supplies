@@ -23,7 +23,6 @@ class Product extends Model
         'name',
         'sku',
         'description',
-        'price',
         'category_id',
         'supplier_id',
         'image',
@@ -35,7 +34,6 @@ class Product extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'price' => 'decimal:2',
         'is_active' => 'boolean',
         'is_featured' => 'boolean',
     ];

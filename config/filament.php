@@ -4,7 +4,7 @@ return [
 
     'brand' => 'AB Sign Supplies',
 
-    'brand_logo' => '/images/logo.jpg',
+    'brand_logo' => '/images/logo.svg',
 
     'colors' => [
         'primary' => '#FE0002',

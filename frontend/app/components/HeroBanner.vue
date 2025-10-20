@@ -1,4 +1,16 @@
-﻿<template>
+<script setup lang="ts">
+import { computed } from 'vue'
+import type { CompanyInfo } from '~/composables/useCompanyInfo'
+
+const companyInfo = useCompanyInfo()
+const company = computed<CompanyInfo | null>(() => companyInfo.data.value ?? null)
+
+const siteName = computed(() => company.value?.site_name?.trim() || 'AB Sign Supplies')
+const tagline = computed(() => company.value?.tagline?.trim() || null)
+const logoUrl = computed(() => company.value?.logo_url ?? '/images/logo.svg')
+</script>
+
+<template>
   <section class="relative overflow-hidden bg-dark">
     <div class="absolute inset-0 opacity-30">
       <div class="pointer-events-none absolute -top-24 -left-20 h-72 w-72 rounded-full bg-primary blur-3xl" />
@@ -32,10 +44,10 @@
       </div>
       <div class="relative w-full max-w-md rounded-xl border border-primary/30 bg-dark/80 p-6 shadow-xl shadow-primary/20">
         <div class="flex items-center gap-3">
-          <img src="/images/logo.jpg" alt="AB Sign Supplies" class="h-14 w-14 rounded border border-primary/50 bg-primary/20" />
+          <img :src="logoUrl" :alt="siteName" class="h-14 w-14 rounded border border-primary/50 bg-primary/20 object-cover" />
           <div>
-            <p class="text-lg font-semibold text-secondary">Quality. Reliability. Speed.</p>
-            <p class="text-sm text-secondary/70">Supplying signage professionals since 1998.</p>
+            <p class="text-lg font-semibold text-secondary">{{ siteName }}</p>
+            <p v-if="tagline" class="text-sm text-secondary/70">{{ tagline }}</p>
           </div>
         </div>
         <dl class="mt-6 grid gap-4 text-secondary/80">

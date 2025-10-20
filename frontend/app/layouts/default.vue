@@ -1,6 +1,7 @@
 ﻿<script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import type { CompanyInfo } from '~/composables/useCompanyInfo'
 
 const navigationLinks = [
   { name: 'Home', to: '/' },
@@ -14,17 +15,12 @@ const mobileMenuOpen = ref(false)
 const currentYear = new Date().getFullYear()
 const route = useRoute()
 
-interface CompanyInfo {
-  site_name?: string | null
-  tagline?: string | null
-  logo_url?: string | null
-}
+const companyInfo = useCompanyInfo()
+const company = computed<CompanyInfo | null>(() => companyInfo.data.value ?? null)
 
-const { data: companyInfo } = await useApiFetch<CompanyInfo>('/company')
-
-const siteName = computed(() => companyInfo.value?.site_name ?? 'AB Sign Supplies')
-const tagline = computed(() => companyInfo.value?.tagline ?? 'Your complete source for signage supplies')
-const logoUrl = computed(() => companyInfo.value?.logo_url ?? '/images/logo.png')
+const siteName = computed(() => company.value?.site_name?.trim() || 'AB Sign Supplies')
+const tagline = computed(() => company.value?.tagline?.trim() || null)
+const logoUrl = computed(() => company.value?.logo_url ?? '/images/logo.svg')
 
 watch(
   () => route.fullPath,
@@ -42,7 +38,7 @@ watch(
           <img :src="logoUrl" :alt="siteName" class="h-12 w-12 rounded border border-primary/20 bg-primary/10 object-cover" />
           <div class="text-left">
             <p class="text-lg font-semibold text-secondary">{{ siteName }}</p>
-            <p class="text-sm text-secondary/70">{{ tagline }}</p>
+            <p v-if="tagline" class="text-sm text-secondary/70">{{ tagline }}</p>
           </div>
         </NuxtLink>
 

@@ -58,12 +58,6 @@ class ProductResource extends Resource
                             ->searchable()
                             ->preload()
                             ->required(),
-                        TextInput::make('price')
-                            ->required()
-                            ->numeric()
-                            ->prefix('$')
-                            ->minValue(0)
-                            ->step(0.01),
                         Toggle::make('is_active')
                             ->label('Active')
                             ->default(true),
@@ -97,7 +91,7 @@ class ProductResource extends Resource
             ->columns([
                 ImageColumn::make('image')
                     ->label('Image')
-                    ->defaultImageUrl(asset('images/logo.png'))
+                    ->defaultImageUrl(asset('images/logo.svg'))
                     ->square()
                     ->height(56),
                 TextColumn::make('name')
@@ -116,9 +110,6 @@ class ProductResource extends Resource
                     ->label('Supplier')
                     ->sortable()
                     ->toggleable(),
-                TextColumn::make('price')
-                    ->money('usd')
-                    ->sortable(),
                 IconColumn::make('is_active')
                     ->boolean()
                     ->label('Active'),

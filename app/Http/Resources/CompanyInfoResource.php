@@ -13,9 +13,12 @@ class CompanyInfoResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $siteName = trim((string) ($this->site_name ?? ''));
+        $tagline = trim((string) ($this->tagline ?? ''));
+
         return [
-            'site_name' => $this->site_name,
-            'tagline' => $this->tagline,
+            'site_name' => $siteName !== '' ? $siteName : 'AB Sign Supplies',
+            'tagline' => $tagline !== '' ? $tagline : null,
             'logo_url' => $this->logo_path ? Storage::url($this->logo_path) : null,
             'about_us' => $this->about_us,
             'contact_email' => $this->contact_email,

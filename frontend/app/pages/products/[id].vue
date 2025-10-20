@@ -1,5 +1,5 @@
-<script setup lang="ts">
-import { computed } from 'vue'
+﻿<script setup lang="ts">
+import { computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 interface ProductCategory {
@@ -23,20 +23,91 @@ interface Product {
 }
 
 const route = useRoute()
-const productId = computed(() => route.params.id)
+const productId = computed(() => String(route.params.id))
 
-const {
-  data: product,
-  pending,
-  error,
-} = await useApiFetch<Product>(`/products/${productId.value}`, {
+interface ProductApiResponse {
+  data: Product
+}
+
+const productResponse = useApiFetch<ProductApiResponse>(() => `/products/${productId.value}`, {
   watch: [productId],
+  key: computed(() => `product-${productId.value}`),
 })
+
+const product = computed<Product | null>(() => productResponse.data.value?.data ?? null)
+const pending = productResponse.pending
+const error = productResponse.error
 
 const breadcrumb = computed(() => [
   { label: 'Products', to: '/products' },
   { label: product.value?.name ?? 'Product', to: `/products/${productId.value}` },
 ])
+
+const requestUrl = useRequestURL()
+const { apply: applySeo } = useSeo({ slug: 'products.show' })
+
+const summarizeDescription = (content?: string | null, length = 160) => {
+  if (!content) {
+    return null
+  }
+
+  const text = content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+
+  if (!text) {
+    return null
+  }
+
+  return text.length > length ? `${text.slice(0, length - 1).trim()}...` : text
+}
+
+const canonicalFromRoute = () => {
+  if (import.meta.client && window?.location) {
+    return `${window.location.origin}${route.fullPath}`
+  }
+
+  return new URL(route.fullPath, requestUrl.origin).href
+}
+
+watch(
+  () => product.value,
+  (productDetails) => {
+    const canonicalUrl = canonicalFromRoute()
+
+    if (!productDetails) {
+      applySeo(
+        {
+          canonicalUrl,
+        },
+        { replace: true },
+      )
+
+      return
+    }
+
+    const description = summarizeDescription(productDetails.description)
+
+    applySeo(
+      {
+        title: productDetails.name,
+        description,
+        canonicalUrl,
+        openGraph: {
+          title: productDetails.name,
+          description,
+          imageUrl: productDetails.image_url ?? null,
+        },
+        twitter: {
+          title: productDetails.name,
+          description,
+          imageUrl: productDetails.image_url ?? null,
+          card: productDetails.image_url ? 'summary_large_image' : 'summary',
+        },
+      },
+      { replace: true },
+    )
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
@@ -61,7 +132,7 @@ const breadcrumb = computed(() => [
     <div v-else-if="product" class="mt-10 grid gap-10 md:grid-cols-[1fr,1.2fr]">
       <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
         <img
-          :src="product.image_url || '/images/logo.png'"
+          :src="product.image_url || '/images/logo.svg'"
           :alt="product.name"
           class="h-full w-full object-cover"
         />
@@ -110,8 +181,9 @@ const breadcrumb = computed(() => [
     </div>
 
     <div v-else-if="error" class="mt-16 rounded-xl border border-red-200 bg-red-50 p-8 text-red-700">
-      We couldn’t load this product. Please return to the
+      We couldn't load this product. Please return to the
       <NuxtLink to="/products" class="underline">product catalog</NuxtLink>.
     </div>
   </div>
 </template>
+

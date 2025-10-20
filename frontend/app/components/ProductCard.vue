@@ -1,4 +1,6 @@
 ﻿<script setup lang="ts">
+import { computed } from 'vue'
+
 interface ProductCategory {
   id: number
   name: string
@@ -20,16 +22,21 @@ interface ProductCardProps {
 }
 
 const props = defineProps<{ product: ProductCardProps }>()
+
+const productLink = computed(() => ({
+  name: 'products-id',
+  params: { id: String(props.product.id) },
+}))
 </script>
 
 <template>
   <NuxtLink
-    :to="`/products/${product.id}`"
+    :to="productLink"
     class="group flex h-full flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:border-primary/60 hover:shadow-lg"
   >
     <div class="relative">
       <img
-        :src="product.image_url || '/images/logo.png'"
+        :src="product.image_url || '/images/logo.svg'"
         :alt="product.name"
         class="h-56 w-full object-cover object-center transition group-hover:scale-[1.01]"
         loading="lazy"

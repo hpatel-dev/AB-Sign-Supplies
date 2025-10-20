@@ -48,6 +48,7 @@ class CompanyInfoResource extends Resource
                                 TextInput::make('tagline')
                                     ->label('Tagline')
                                     ->maxLength(255)
+                                    ->helperText('Leave blank to hide the tagline on the public site.')
                                     ->nullable(),
                                 FileUpload::make('logo_path')
                                     ->label('Logo')
@@ -100,7 +101,7 @@ class CompanyInfoResource extends Resource
                     ->disk('public')
                     ->circular()
                     ->height(40)
-                    ->defaultImageUrl(asset('images/logo.png')),
+                    ->defaultImageUrl(asset('images/logo.svg')),
                 TextColumn::make('site_name')
                     ->label('Website Name')
                     ->searchable()

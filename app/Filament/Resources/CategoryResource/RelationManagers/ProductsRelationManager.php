@@ -37,11 +37,6 @@ class ProductsRelationManager extends RelationManager
                 ->searchable()
                 ->preload()
                 ->required(),
-            TextInput::make('price')
-                ->required()
-                ->numeric()
-                ->minValue(0)
-                ->step(0.01),
             Toggle::make('is_active')
                 ->label('Active')
                 ->default(true),
@@ -77,9 +72,6 @@ class ProductsRelationManager extends RelationManager
                     ->label('SKU')
                     ->searchable()
                     ->toggleable(),
-                TextColumn::make('price')
-                    ->money('usd')
-                    ->sortable(),
                 IconColumn::make('is_active')
                     ->boolean()
                     ->label('Active'),

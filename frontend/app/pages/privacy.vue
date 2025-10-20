@@ -1,4 +1,7 @@
-﻿<template>
+﻿<script setup lang="ts">
+useSeo({ slug: 'privacy' })
+</script>
+<template>
   <div class="mx-auto w-full max-w-4xl px-6 py-24 space-y-6 text-secondary/75">
     <h1 class="text-4xl font-bold text-secondary">Privacy Policy</h1>
     <p>
@@ -11,3 +14,5 @@
     </ul>
   </div>
 </template>
+
+

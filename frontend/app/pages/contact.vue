@@ -1,62 +1,94 @@
-<script setup lang="ts">
-interface CompanyInfo {
-  contact_email: string;
-  contact_phone: string;
-  address: string;
-  google_map_embed?: string | null;
-}
+﻿<script setup lang="ts">
+import { computed, reactive, ref, watch } from 'vue'
+import type { CompanyInfo } from '~/composables/useCompanyInfo'
 
-const companyInfo = await useApiFetch<CompanyInfo>('/company');
+const companyInfo = useApiFetch<CompanyInfo>('/company')
+const company = computed<CompanyInfo | null>(() => companyInfo.data.value ?? null)
+const { apply: applySeo } = useSeo({ slug: 'contact' })
 
 const formState = reactive({
   name: '',
   email: '',
   message: '',
-});
+})
 
-const errors = reactive<Record<string, string[]>>({});
-const isSubmitting = ref(false);
-const successMessage = ref('');
+const errors = reactive<Record<string, string[]>>({})
+const isSubmitting = ref(false)
+const successMessage = ref('')
 
-const runtimeConfig = useRuntimeConfig();
+const runtimeConfig = useRuntimeConfig()
+
+const buildContactDescription = (info?: CompanyInfo | null) => {
+  if (!info) {
+    return null
+  }
+
+  const details = [
+    info.contact_email ? `Email ${info.contact_email}` : null,
+    info.contact_phone ? `Call ${info.contact_phone}` : null,
+    info.address ? `Visit us at ${info.address}` : null,
+  ].filter(Boolean)
+
+  if (!details.length) {
+    return null
+  }
+
+  return `Connect with our team: ${details.join(', ')}.`
+}
+
+watch(
+  () => company.value,
+  (info) => {
+    const description = buildContactDescription(info)
+
+    if (description) {
+      applySeo({
+        description,
+        openGraph: { description },
+        twitter: { description },
+      })
+    }
+  },
+  { immediate: true },
+)
 
 const resetForm = () => {
-  formState.name = '';
-  formState.email = '';
-  formState.message = '';
-};
+  formState.name = ''
+  formState.email = ''
+  formState.message = ''
+}
 
 const submitForm = async () => {
-  isSubmitting.value = true;
-  successMessage.value = '';
-  Object.keys(errors).forEach(key => delete errors[key]);
+  isSubmitting.value = true
+  successMessage.value = ''
+  Object.keys(errors).forEach(key => delete errors[key])
 
   try {
     await $fetch(`${runtimeConfig.public.apiBase}/contact`, {
       method: 'POST',
       body: { ...formState },
-    });
+    })
 
-    successMessage.value = 'Thank you! Our team will respond shortly.';
-    resetForm();
+    successMessage.value = 'Thank you! Our team will respond shortly.'
+    resetForm()
   }
   catch (error: any) {
     if (error?.response?.status === 422) {
-      Object.assign(errors, error.response._data?.errors ?? {});
+      Object.assign(errors, error.response._data?.errors ?? {})
     }
     else {
-      successMessage.value = 'Something went wrong. Please try again or reach us by phone.';
+      successMessage.value = 'Something went wrong. Please try again or reach us by phone.'
     }
   }
   finally {
-    isSubmitting.value = false;
+    isSubmitting.value = false
   }
-};
+}
 </script>
 
 <template>
   <div class="mx-auto w-full max-w-6xl px-6 py-24">
-    <SectionHeading title="Contact Us" subtitle="We’re ready to help" />
+    <SectionHeading title="Contact Us" subtitle="We're ready to help" />
 
     <div class="mt-12 grid gap-10 lg:grid-cols-2">
       <form class="space-y-6 rounded-xl border border-secondary/20 bg-dark/70 p-8 shadow-lg shadow-black/10" @submit.prevent="submitForm">
@@ -120,25 +152,26 @@ const submitForm = async () => {
           Need immediate assistance? Reach out to our customer success team by phone or email. We respond to most inquiries within one business day.
         </p>
 
-        <div v-if="companyInfo.data" class="space-y-4 text-secondary/80">
+        <div v-if="company" class="space-y-4 text-secondary/80">
           <div>
             <p class="text-sm uppercase tracking-wide text-secondary/60">Email</p>
-            <p class="text-lg font-semibold text-secondary">{{ companyInfo.data.contact_email }}</p>
+            <p class="text-lg font-semibold text-secondary">{{ company.contact_email }}</p>
           </div>
           <div>
             <p class="text-sm uppercase tracking-wide text-secondary/60">Phone</p>
-            <p class="text-lg font-semibold text-secondary">{{ companyInfo.data.contact_phone }}</p>
+            <p class="text-lg font-semibold text-secondary">{{ company.contact_phone }}</p>
           </div>
           <div>
             <p class="text-sm uppercase tracking-wide text-secondary/60">Address</p>
-            <p class="text-lg font-semibold text-secondary">{{ companyInfo.data.address }}</p>
+            <p class="text-lg font-semibold text-secondary">{{ company.address }}</p>
           </div>
         </div>
 
-        <div v-if="companyInfo.data?.google_map_embed" class="overflow-hidden rounded-xl border border-secondary/20">
-          <div class="aspect-video" v-html="companyInfo.data.google_map_embed" />
+        <div v-if="company?.google_map_embed" class="overflow-hidden rounded-xl border border-secondary/20">
+          <div class="aspect-video" v-html="company.google_map_embed" />
         </div>
       </aside>
     </div>
   </div>
 </template>
+

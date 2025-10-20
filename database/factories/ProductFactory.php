@@ -22,7 +22,6 @@ class ProductFactory extends Factory
             'name' => $this->faker->words(3, true),
             'sku' => strtoupper($this->faker->unique()->bothify('SKU-#####')),
             'description' => $this->faker->paragraph(),
-            'price' => $this->faker->randomFloat(2, 25, 500),
             'category_id' => Category::factory(),
             'supplier_id' => Supplier::factory(),
             'image' => null,
