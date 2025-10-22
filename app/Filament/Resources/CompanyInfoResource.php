@@ -7,6 +7,7 @@ use App\Models\CompanyInfo;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\Textarea;
@@ -50,14 +51,99 @@ class CompanyInfoResource extends Resource
                                     ->maxLength(255)
                                     ->helperText('Leave blank to hide the tagline on the public site.')
                                     ->nullable(),
-                                FileUpload::make('logo_path')
-                                    ->label('Logo')
-                                    ->image()
-                                    ->imagePreviewHeight('160')
-                                    ->directory('company/logos')
-                                    ->visibility('public')
+                                FileUpload::make('logo_path')->label('Logo')->disk('public')->visibility('public')
                                     ->nullable()
                                     ->columnSpanFull(),
+                            ])
+                            ->columns(2),
+                        Tab::make('Hero')
+                            ->schema([
+                                TextInput::make('hero_headline')
+                                    ->label('Headline')
+                                    ->maxLength(255)
+                                    ->nullable()
+                                    ->helperText('Defaults to "Your Complete Source for Signage Supplies" when left empty.'),
+                                Textarea::make('hero_subheadline')
+                                    ->label('Supporting copy')
+                                    ->rows(3)
+                                    ->nullable(),
+                                TextInput::make('hero_primary_cta_label')
+                                    ->label('Primary CTA Label')
+                                    ->maxLength(100)
+                                    ->nullable(),
+                                TextInput::make('hero_primary_cta_url')
+                                    ->label('Primary CTA URL')
+                                    ->helperText('Accepts relative paths (e.g. /products) or full URLs.')
+                                    ->maxLength(255)
+                                    ->nullable(),
+                                TextInput::make('hero_secondary_cta_label')
+                                    ->label('Secondary CTA Label')
+                                    ->maxLength(100)
+                                    ->nullable(),
+                                TextInput::make('hero_secondary_cta_url')
+                                    ->label('Secondary CTA URL')
+                                    ->helperText('Accepts relative paths (e.g. /contact) or full URLs.')
+                                    ->maxLength(255)
+                                    ->nullable(),
+                                Select::make('hero_media_type')
+                                    ->label('Background Media Type')
+                                    ->placeholder('None')
+                                    ->options([
+                                        'image' => 'Image',
+                                        'video' => 'Video',
+                                    ])
+                                    ->nullable(),
+                                FileUpload::make('hero_media_path')
+                                    ->label('Background Media')
+                                    ->disk('public')
+                                    ->directory('company/hero')
+                                    ->visibility('public')
+                                    ->acceptedFileTypes([
+                                        'image/jpeg',
+                                        'image/png',
+                                        'image/webp',
+                                        'video/mp4',
+                                        'video/webm',
+                                    ])
+                                    ->helperText('Upload an image or short looping video to sit behind the hero content.')
+                                    ->nullable()
+                                    ->visible(fn (callable $get): bool => filled($get('hero_media_type'))),
+                                TextInput::make('stat_one_value')
+                                    ->label('Stat 1 Value')
+                                    ->maxLength(50)
+                                    ->nullable(),
+                                TextInput::make('stat_one_label')
+                                    ->label('Stat 1 Label')
+                                    ->maxLength(100)
+                                    ->nullable(),
+                                Select::make('stat_one_icon')
+                                    ->label('Stat 1 Icon')
+                                    ->options(self::statIconOptions())
+                                    ->nullable(),
+                                TextInput::make('stat_two_value')
+                                    ->label('Stat 2 Value')
+                                    ->maxLength(50)
+                                    ->nullable(),
+                                TextInput::make('stat_two_label')
+                                    ->label('Stat 2 Label')
+                                    ->maxLength(100)
+                                    ->nullable(),
+                                Select::make('stat_two_icon')
+                                    ->label('Stat 2 Icon')
+                                    ->options(self::statIconOptions())
+                                    ->nullable(),
+                                TextInput::make('stat_three_value')
+                                    ->label('Stat 3 Value')
+                                    ->maxLength(50)
+                                    ->nullable(),
+                                TextInput::make('stat_three_label')
+                                    ->label('Stat 3 Label')
+                                    ->maxLength(100)
+                                    ->nullable(),
+                                Select::make('stat_three_icon')
+                                    ->label('Stat 3 Icon')
+                                    ->options(self::statIconOptions())
+                                    ->nullable(),
                             ])
                             ->columns(2),
                         Tab::make('Overview')
@@ -143,6 +229,17 @@ class CompanyInfoResource extends Resource
         ];
     }
 
+    protected static function statIconOptions(): array
+    {
+        return [
+            'box' => 'Shipping Box',
+            'globe' => 'Global Reach',
+            'headset' => 'Support Headset',
+            'bolt' => 'Lightning Bolt',
+            'certificate' => 'Certification',
+            'star' => 'Star',
+        ];
+    }
     public static function getPages(): array
     {
         return [
@@ -161,4 +258,15 @@ class CompanyInfoResource extends Resource
     {
         return (string) CompanyInfo::query()->count();
     }
+
+    public static function canCreate(): bool
+    {
+        return ! CompanyInfo::query()->exists();
+    }
 }
+
+
+
+
+
+

@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('contact_messages', function (Blueprint $table) {
+        Schema::create('company_services', function (Blueprint $table): void {
             $table->id();
-            $table->string('name');
-            $table->string('email')->nullable();
-            $table->text('message');
-            $table->timestamp('handled_at')->nullable();
+            $table->foreignId('company_id')->constrained()->cascadeOnDelete();
+            $table->string('title');
+            $table->string('description', 1024)->nullable();
+            $table->unsignedInteger('sort_order')->default(0);
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -27,6 +26,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('contact_messages');
+        Schema::dropIfExists('company_services');
     }
 };
+

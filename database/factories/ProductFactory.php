@@ -2,8 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\Category;
-use App\Models\Supplier;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -21,9 +19,9 @@ class ProductFactory extends Factory
         return [
             'name' => $this->faker->words(3, true),
             'sku' => strtoupper($this->faker->unique()->bothify('SKU-#####')),
-            'description' => $this->faker->paragraph(),
-            'category_id' => Category::factory(),
-            'supplier_id' => Supplier::factory(),
+            'description' => collect($this->faker->paragraphs(3))
+                ->map(fn (string $paragraph) => "<p>{$paragraph}</p>")
+                ->implode(''),
             'image' => null,
             'is_active' => $this->faker->boolean(90),
             'is_featured' => $this->faker->boolean(20),

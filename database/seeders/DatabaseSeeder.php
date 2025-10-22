@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Models\Category;
+use App\Models\Company;
 use App\Models\CompanyInfo;
+use App\Models\CompanyService;
 use App\Models\ContactMessage;
 use App\Models\Product;
-use App\Models\Supplier;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -20,15 +20,27 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $categories = Category::factory(5)->create();
-        $suppliers = Supplier::factory(5)->create();
-
-        Product::factory(20)
-            ->recycle($categories)
-            ->recycle($suppliers)
-            ->create();
+        Product::factory(20)->create();
 
         CompanyInfo::factory()->create();
+
+        Company::factory(3)
+            ->create()
+            ->each(function (Company $company, int $index): void {
+                $services = [
+                    ['title' => 'Wayfinding Strategy', 'description' => 'Needs assessments, nomenclature plans, and site logistics.'],
+                    ['title' => 'Fabrication & Installation', 'description' => 'Managed production and installation for complex rollouts.'],
+                    ['title' => 'Maintenance Programs', 'description' => 'Preventative maintenance and emergency service plans.'],
+                ];
+
+                CompanyService::factory()
+                    ->count(count($services))
+                    ->sequence(...$services)
+                    ->for($company)
+                    ->create();
+
+                $company->update(['sort_order' => $index]);
+            });
 
         ContactMessage::factory(5)->create();
 

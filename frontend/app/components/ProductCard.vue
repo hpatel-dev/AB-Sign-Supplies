@@ -1,23 +1,12 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 import { computed } from 'vue'
-
-interface ProductCategory {
-  id: number
-  name: string
-}
-
-interface ProductSupplier {
-  id: number
-  name: string
-}
 
 interface ProductCardProps {
   id: number
   name: string
   description?: string | null
+  description_html?: string | null
   image_url?: string | null
-  category?: ProductCategory | null
-  supplier?: ProductSupplier | null
   is_featured?: boolean
 }
 
@@ -50,14 +39,16 @@ const productLink = computed(() => ({
     </div>
     <div class="flex flex-1 flex-col gap-4 p-6">
       <div>
-        <p class="text-xs uppercase tracking-wide text-secondary/60">{{ product.category?.name || 'Product' }}</p>
-        <h3 class="mt-1 text-xl font-semibold text-secondary transition group-hover:text-primary">{{ product.name }}</h3>
+        <p class="text-xs uppercase tracking-wide text-secondary/60">Product</p>
+        <h3 class="mt-1 text-xl font-semibold text-secondary transition group-hover:text-primary">
+          {{ product.name }}
+        </h3>
       </div>
       <p class="line-clamp-3 text-sm text-secondary/70">
         {{ product.description || 'Versatile signage accessory ready to integrate with your next build.' }}
       </p>
       <div class="mt-auto text-xs uppercase tracking-wide text-secondary/50">
-        {{ product.supplier?.name || 'AB Sign Supplies' }}
+        View detail
       </div>
     </div>
   </NuxtLink>

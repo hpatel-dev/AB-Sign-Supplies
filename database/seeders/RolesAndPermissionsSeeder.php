@@ -28,7 +28,7 @@ class RolesAndPermissionsSeeder extends Seeder
         $superAdminRole->syncPermissions($permissions);
 
         $editorRole->syncPermissions(
-            $this->filterPermissions($permissions, ['product', 'category', 'supplier'], includeWidgets: true)
+            $this->filterPermissions($permissions, ['product', 'company'], includeWidgets: true)
         );
 
         $viewerRole->syncPermissions(
@@ -44,9 +44,8 @@ class RolesAndPermissionsSeeder extends Seeder
                 }
 
                 return str_contains($name, 'product')
-                    || str_contains($name, 'category')
-                    || str_contains($name, 'supplier')
-                    || str_contains($name, 'company::info');
+                    || str_contains($name, 'company::info')
+                    || str_contains($name, 'company');
             })
         );
     }
@@ -73,3 +72,4 @@ class RolesAndPermissionsSeeder extends Seeder
         });
     }
 }
+

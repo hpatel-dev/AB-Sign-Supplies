@@ -3,7 +3,6 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Product;
-use App\Models\Supplier;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Carbon;
@@ -22,7 +21,7 @@ class ProductStatsOverview extends BaseWidget
     {
         $totalProducts = Product::query()->count();
         $activeProducts = Product::query()->active()->count();
-        $totalSuppliers = Supplier::query()->count();
+        $featuredProducts = Product::query()->featured(true)->count();
 
         $sparkline = $this->productSparkline(points: 7);
 
@@ -39,11 +38,11 @@ class ProductStatsOverview extends BaseWidget
                 ->color('primary')
                 ->chart($sparkline)
                 ->extraAttributes(['class' => 'bg-dark text-secondary border-none shadow-sm']),
-            Stat::make('Total Suppliers', number_format($totalSuppliers))
-                ->description('Vendor partners')
-                ->descriptionIcon('heroicon-o-truck')
+            Stat::make('Featured Products', number_format($featuredProducts))
+                ->description('Highlighted in catalog')
+                ->descriptionIcon('heroicon-o-star')
                 ->color('primary')
-                ->chart($this->supplierSparkline(points: 7))
+                ->chart($sparkline)
                 ->extraAttributes(['class' => 'bg-dark text-secondary border-none shadow-sm']),
         ];
     }
@@ -54,14 +53,6 @@ class ProductStatsOverview extends BaseWidget
     protected function productSparkline(int $points = 14): array
     {
         return $this->countByDay(Product::query(), $points);
-    }
-
-    /**
-     * @return array<int, int>
-     */
-    protected function supplierSparkline(int $points = 14): array
-    {
-        return $this->countByDay(Supplier::query(), $points);
     }
 
     /**

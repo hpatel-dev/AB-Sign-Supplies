@@ -3,12 +3,10 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductResource\Pages;
-use App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\Product;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -18,7 +16,6 @@ use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
@@ -42,28 +39,22 @@ class ProductResource extends Resource
                 Section::make('Product Information')
                     ->schema([
                         TextInput::make('name')
+                            ->label('Name')
                             ->required()
                             ->maxLength(255),
                         TextInput::make('sku')
+                            ->label('SKU')
                             ->required()
                             ->maxLength(255)
                             ->unique(ignoreRecord: true),
-                        Select::make('category_id')
-                            ->relationship('category', 'name')
-                            ->searchable()
-                            ->preload()
-                            ->required(),
-                        Select::make('supplier_id')
-                            ->relationship('supplier', 'name')
-                            ->searchable()
-                            ->preload()
-                            ->required(),
                         Toggle::make('is_active')
                             ->label('Active')
-                            ->default(true),
+                            ->default(true)
+                            ->columnSpan(1),
                         Toggle::make('is_featured')
                             ->label('Featured')
-                            ->default(false),
+                            ->default(false)
+                            ->columnSpan(1),
                     ])
                     ->columns(2),
                 Section::make('Media & Description')
@@ -102,14 +93,6 @@ class ProductResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
-                TextColumn::make('category.name')
-                    ->label('Category')
-                    ->sortable()
-                    ->searchable(),
-                TextColumn::make('supplier.name')
-                    ->label('Supplier')
-                    ->sortable()
-                    ->toggleable(),
                 IconColumn::make('is_active')
                     ->boolean()
                     ->label('Active'),
@@ -123,10 +106,6 @@ class ProductResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('category')
-                    ->relationship('category', 'name'),
-                SelectFilter::make('supplier')
-                    ->relationship('supplier', 'name'),
                 TernaryFilter::make('is_active')
                     ->label('Active')
                     ->nullable()

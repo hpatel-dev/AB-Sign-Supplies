@@ -1,15 +1,27 @@
 ﻿<script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue'
 import type { CompanyInfo } from '~/composables/useCompanyInfo'
+import { useCompanyInfo } from '~/composables/useCompanyInfo'
 
-const companyInfo = useApiFetch<CompanyInfo>('/company')
+const companyInfo = useCompanyInfo()
 const company = computed<CompanyInfo | null>(() => companyInfo.data.value ?? null)
 const { apply: applySeo } = useSeo({ slug: 'contact' })
+
+const route = useRoute()
+const productFromQuery = computed(() => (typeof route.query.product === 'string' ? route.query.product : ''))
 
 const formState = reactive({
   name: '',
   email: '',
+  phone: '',
+  product: '',
   message: '',
+})
+
+formState.product = productFromQuery.value
+
+watch(productFromQuery, value => {
+  formState.product = value
 })
 
 const errors = reactive<Record<string, string[]>>({})
@@ -18,7 +30,7 @@ const successMessage = ref('')
 
 const runtimeConfig = useRuntimeConfig()
 
-const buildContactDescription = (info?: CompanyInfo | null) => {
+const buildContactDescription = (info?: CompanyInfo | null, productName?: string | null) => {
   if (!info) {
     return null
   }
@@ -30,16 +42,18 @@ const buildContactDescription = (info?: CompanyInfo | null) => {
   ].filter(Boolean)
 
   if (!details.length) {
-    return null
+    return productName ? `Discussing interest in ${productName}.` : null
   }
 
-  return `Connect with our team: ${details.join(', ')}.`
+  const prefix = productName ? `Discussing interest in ${productName}. ` : ''
+
+  return `${prefix}Connect with our team: ${details.join(', ')}.`
 }
 
 watch(
   () => company.value,
   (info) => {
-    const description = buildContactDescription(info)
+    const description = buildContactDescription(info, productFromQuery.value || null)
 
     if (description) {
       applySeo({
@@ -52,10 +66,24 @@ watch(
   { immediate: true },
 )
 
+watch(productFromQuery, value => {
+  const description = buildContactDescription(company.value, value || null)
+
+  if (description) {
+    applySeo({
+      description,
+      openGraph: { description },
+      twitter: { description },
+    })
+  }
+})
+
 const resetForm = () => {
   formState.name = ''
   formState.email = ''
+  formState.phone = ''
   formState.message = ''
+  formState.product = productFromQuery.value
 }
 
 const submitForm = async () => {
@@ -119,6 +147,35 @@ const submitForm = async () => {
         </div>
 
         <div>
+          <label class="block text-sm font-semibold text-secondary/70" for="contact-phone">Phone</label>
+          <input
+            id="contact-phone"
+            v-model="formState.phone"
+            type="tel"
+            inputmode="tel"
+            required
+            minlength="7"
+            pattern="[\d\s()+-]{7,}"
+            title="Enter at least 7 characters using digits, spaces, parentheses, or +."
+            placeholder="+1 (555) 123-4567"
+            class="mt-2 w-full rounded-md border border-secondary/30 bg-dark/60 px-4 py-3 text-secondary placeholder:text-secondary/40 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/60"
+          />
+          <p v-if="errors.phone" class="mt-2 text-sm text-primary">{{ errors.phone[0] }}</p>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-secondary/70" for="contact-product">Product of interest</label>
+          <input
+            id="contact-product"
+            v-model="formState.product"
+            type="text"
+            placeholder="e.g. Illuminated channel letters"
+            class="mt-2 w-full rounded-md border border-secondary/30 bg-dark/60 px-4 py-3 text-secondary placeholder:text-secondary/40 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/60"
+          />
+          <p v-if="errors.product" class="mt-2 text-sm text-primary">{{ errors.product[0] }}</p>
+        </div>
+
+        <div>
           <label class="block text-sm font-semibold text-secondary/70" for="contact-message">How can we help?</label>
           <textarea
             id="contact-message"
@@ -174,4 +231,5 @@ const submitForm = async () => {
     </div>
   </div>
 </template>
+
 

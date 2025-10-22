@@ -4,7 +4,8 @@
 
 @layer base {
   body {
-    @apply bg-slate-50 text-secondary font-sans antialiased;
+    @apply font-sans antialiased text-secondary;
+    background-color: #171E28;
   }
 
   a {

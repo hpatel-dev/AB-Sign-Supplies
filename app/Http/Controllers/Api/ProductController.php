@@ -12,17 +12,8 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $query = Product::query()
-            ->with(['category', 'supplier'])
             ->active()
             ->search($request->string('search')->toString());
-
-        if ($request->filled('category')) {
-            $query->where('category_id', $request->integer('category'));
-        }
-
-        if ($request->filled('supplier')) {
-            $query->where('supplier_id', $request->integer('supplier'));
-        }
 
         if ($request->filled('featured')) {
             $query->featured($request->boolean('featured'));
@@ -44,8 +35,6 @@ class ProductController extends Controller
 
     public function show(Product $product): ProductResource
     {
-        $product->load(['category', 'supplier']);
-
         return new ProductResource($product);
     }
 }

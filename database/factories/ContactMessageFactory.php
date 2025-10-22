@@ -19,6 +19,8 @@ class ContactMessageFactory extends Factory
         return [
             'name' => $this->faker->name(),
             'email' => $this->faker->safeEmail(),
+            'phone' => $this->faker->optional()->e164PhoneNumber(),
+            'product' => $this->faker->optional()->words(3, true),
             'message' => $this->faker->paragraph(3),
             'handled_at' => $this->faker->optional(0.2)->dateTimeBetween('-1 month'),
         ];

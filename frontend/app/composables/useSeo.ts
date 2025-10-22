@@ -124,14 +124,25 @@ export const useSeo = (
   const requestUrl = useRequestURL();
 
   const overridesState = ref<PartialSeoState>(normalizeOverrides(resolvedOptions.overrides));
+  const siteOrigin = resolveSiteOrigin(runtimeConfig.public, requestUrl);
 
   const defaults = computed<SeoState>(() =>
-    buildDefaultState((companyInfo.value as CompanyInfo | null) ?? null, runtimeConfig.public, requestUrl),
+    buildDefaultState(
+      (companyInfo.value as CompanyInfo | null) ?? null,
+      runtimeConfig.public,
+      requestUrl,
+      siteOrigin,
+    ),
   );
-  const backendState = computed<PartialSeoState>(() => transformBackendState(backend.value));
-  const finalState = computed<SeoState>(() =>
-    mergeSeoStates(defaults.value, backendState.value, overridesState.value),
+  const backendState = computed<PartialSeoState>(() =>
+    transformBackendState(backend.value, siteOrigin, requestUrl),
   );
+  const finalState = computed<SeoState>(() => {
+    const merged = mergeSeoStates(defaults.value, backendState.value, overridesState.value);
+    merged.canonicalUrl = normalizeCanonicalUrlValue(merged.canonicalUrl, siteOrigin, requestUrl);
+
+    return merged;
+  });
 
   useSeoMeta({
     title: () => finalState.value.title || undefined,
@@ -264,6 +275,7 @@ const buildDefaultState = (
   companyInfo: CompanyInfo | null,
   publicConfig: Record<string, unknown>,
   requestUrl: URL,
+  siteOrigin: string,
 ): SeoState => {
   const defaultTitle =
     normalizeString(companyInfo?.site_name) ??
@@ -276,11 +288,13 @@ const buildDefaultState = (
 
   const defaultImage =
     normalizeString(companyInfo?.logo_url) ?? '/favicon.png';
+  const canonicalPath = `${requestUrl.pathname}${requestUrl.search ?? ''}` || '/';
 
   return {
     title: defaultTitle,
     description: defaultDescription,
-    canonicalUrl: requestUrl.href,
+    canonicalUrl:
+      normalizeCanonicalUrlValue(canonicalPath, siteOrigin, requestUrl) ?? requestUrl.href,
     openGraph: {
       title: defaultTitle,
       description: defaultDescription,
@@ -296,7 +310,11 @@ const buildDefaultState = (
   };
 };
 
-const transformBackendState = (payload: BackendSeo | null): PartialSeoState => {
+const transformBackendState = (
+  payload: BackendSeo | null,
+  siteOrigin: string,
+  requestUrl: URL,
+): PartialSeoState => {
   if (!payload) {
     return {};
   }
@@ -304,7 +322,7 @@ const transformBackendState = (payload: BackendSeo | null): PartialSeoState => {
   return {
     title: normalizeString(payload.title),
     description: normalizeString(payload.description),
-    canonicalUrl: normalizeString(payload.canonical_url),
+    canonicalUrl: normalizeCanonicalUrlValue(payload.canonical_url, siteOrigin, requestUrl),
     openGraph: {
       title: normalizeString(payload.open_graph?.title),
       description: normalizeString(payload.open_graph?.description),
@@ -642,6 +660,56 @@ const mergeMetaTags = (...lists: Array<SeoMetaTag[] | undefined>): SeoMetaTag[] 
   }
 
   return entries;
+};
+
+const resolveSiteOrigin = (publicConfig: Record<string, unknown>, requestUrl: URL): string => {
+  const configured = typeof publicConfig.siteUrl === 'string' ? publicConfig.siteUrl.trim() : '';
+
+  if (configured) {
+    try {
+      const url = new URL(configured);
+      return `${url.protocol}//${url.host}`;
+    } catch {
+      // fall through to request origin
+    }
+  }
+
+  return requestUrl.origin;
+};
+
+const normalizeCanonicalUrlValue = (
+  value: string | null,
+  siteOrigin: string,
+  requestUrl: URL,
+): string | null => {
+  const normalized = normalizeString(value);
+
+  if (!normalized) {
+    return null;
+  }
+
+  if (/^https?:\/\//i.test(normalized)) {
+    return normalized;
+  }
+
+  if (normalized.startsWith('//')) {
+    return `${requestUrl.protocol}${normalized}`;
+  }
+
+  const base = siteOrigin || requestUrl.origin;
+  const path = normalized.startsWith('/') ? normalized : `/${normalized}`;
+
+  try {
+    const href = new URL(path, `${base.replace(/\/+$/, '')}/`).href;
+
+    if (path === '/') {
+      return href;
+    }
+
+    return href.replace(/\/+$/, '');
+  } catch {
+    return normalized;
+  }
 };
 
 const resolveMaybeString = (

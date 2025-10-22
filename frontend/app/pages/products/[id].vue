@@ -1,24 +1,13 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 import { computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
-
-interface ProductCategory {
-  id: number
-  name: string
-}
-
-interface ProductSupplier {
-  id: number
-  name: string
-}
 
 interface Product {
   id: number
   name: string
   description?: string | null
+  description_html?: string | null
   image_url?: string | null
-  category?: ProductCategory | null
-  supplier?: ProductSupplier | null
   is_featured?: boolean
 }
 
@@ -37,6 +26,7 @@ const productResponse = useApiFetch<ProductApiResponse>(() => `/products/${produ
 const product = computed<Product | null>(() => productResponse.data.value?.data ?? null)
 const pending = productResponse.pending
 const error = productResponse.error
+
 
 const breadcrumb = computed(() => [
   { label: 'Products', to: '/products' },
@@ -141,7 +131,7 @@ watch(
       <div class="space-y-8">
         <div>
           <p class="text-xs uppercase tracking-wide text-secondary/60">
-            {{ product.category?.name || 'Product' }}
+            Product
           </p>
           <h1 class="mt-2 text-3xl font-semibold text-secondary">
             {{ product.name }}
@@ -152,16 +142,9 @@ watch(
         </div>
 
         <div class="prose prose-slate max-w-none text-secondary/80">
-          <div v-if="product.description" v-html="product.description" />
+          <div v-if="product.description_html" v-html="product.description_html" />
           <p v-else>
             Detailed specifications for this product are coming soon. Please reach out through our contact form for assistance.
-          </p>
-        </div>
-
-        <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <h2 class="text-sm font-semibold uppercase tracking-wide text-secondary/60">Supplier</h2>
-          <p class="mt-1 text-lg font-medium text-secondary">
-            {{ product.supplier?.name || 'AB Sign Supplies' }}
           </p>
         </div>
 
@@ -171,7 +154,7 @@ watch(
             Contact our team for quotes, availability, and recommendations tailored to your signage project.
           </p>
           <NuxtLink
-            to="/contact"
+            :to="{ path: '/contact', query: { product: product.name } }"
             class="mt-4 inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2 text-sm font-semibold text-white transition hover:bg-primary/90"
           >
             Contact Us
@@ -186,4 +169,6 @@ watch(
     </div>
   </div>
 </template>
+
+
 
