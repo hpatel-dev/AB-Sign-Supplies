@@ -69,7 +69,7 @@ watch(
         </div>
       </div>
 
-      <div v-if="company.google_map_embed" class="overflow-hidden rounded-xl border border-gray-200 shadow-sm">
+      <div v-if="company.google_map_embed" class="map-embed overflow-hidden rounded-xl border border-gray-200 shadow-sm">
         <div class="aspect-video" v-html="company.google_map_embed" />
       </div>
     </div>
@@ -79,4 +79,17 @@ watch(
     </div>
   </div>
 </template>
+
+<style scoped>
+.map-embed :deep(iframe) {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.map-embed :deep(div) {
+  width: 100% !important;
+  height: 100% !important;
+}
+</style>
 

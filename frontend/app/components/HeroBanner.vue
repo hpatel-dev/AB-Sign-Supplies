@@ -12,7 +12,7 @@ interface CategorySummary {
 const companyInfo = useCompanyInfo()
 const categoriesResponse = useApiFetch<{ data: CategorySummary[] }>('/categories', {
   key: 'hero-categories',
-  default: () => ({ data: [] }),
+  default: () => ref<{ data: CategorySummary[] }>({ data: [] }),
 })
 
 const company = computed<CompanyInfo | null>(() => companyInfo.data.value ?? null)
@@ -235,15 +235,19 @@ const statIconPath = (icon: string) => {
         >
           <NuxtLink
             :to="hero.primaryCta.url"
-            class="rounded-md bg-primary px-6 py-3 font-semibold text-secondary transition hover:bg-primary/90"
+            class="hero-cta hero-cta--primary rounded-md bg-primary px-6 py-3 font-semibold text-secondary transition hover:bg-primary/90"
+            :class="{ 'hero-cta--intro': textAnimationActive }"
+            :style="textAnimationActive ? { animationDelay: '0.35s' } : undefined"
           >
             {{ hero.primaryCta.label }}
           </NuxtLink>
           <div v-if="hero.secondaryCta.label && topCategories.length" class="relative" ref="categoryMenuRef">
             <button
               type="button"
-              class="inline-flex items-center gap-2 rounded-md border border-secondary/40 px-6 py-3 text-sm font-semibold text-secondary transition hover:border-primary hover:text-primary"
+              class="hero-cta hero-cta--secondary inline-flex items-center gap-2 rounded-md border border-secondary/40 px-6 py-3 text-sm font-semibold text-secondary transition hover:border-primary hover:text-primary"
               @click.stop="toggleCategoryMenu"
+              :class="{ 'hero-cta--intro': textAnimationActive }"
+              :style="textAnimationActive ? { animationDelay: '0.42s' } : undefined"
             >
               {{ hero.secondaryCta.label }}
               <svg
@@ -285,7 +289,9 @@ const statIconPath = (icon: string) => {
           <NuxtLink
             v-else-if="hero.secondaryCta.label"
             :to="hero.secondaryCta.url"
-            class="rounded-md border border-secondary/40 px-6 py-3 text-sm font-semibold text-secondary transition hover:border-primary hover:text-primary"
+            class="hero-cta hero-cta--secondary rounded-md border border-secondary/40 px-6 py-3 text-sm font-semibold text-secondary transition hover:border-primary hover:text-primary"
+            :class="{ 'hero-cta--intro': textAnimationActive }"
+            :style="textAnimationActive ? { animationDelay: '0.42s' } : undefined"
           >
             {{ hero.secondaryCta.label }}
           </NuxtLink>
@@ -305,8 +311,12 @@ const statIconPath = (icon: string) => {
           <div class="absolute inset-0 bg-dark/80" />
         </template>
 
-        <div class="relative flex items-center gap-3">
-          <img :src="logoUrl" :alt="siteName" class="h-14 w-14 rounded border border-primary/50 bg-primary/20 object-cover" />
+        <div class="relative flex items-center gap-4">
+          <img
+            :src="logoUrl"
+            :alt="siteName"
+            class="h-[120px] w-[120px] rounded-[1.75rem] object-contain"
+          />
           <div>
             <p class="text-lg font-semibold text-secondary">{{ siteName }}</p>
             <p v-if="tagline" class="text-sm text-secondary/70">{{ tagline }}</p>
@@ -357,9 +367,125 @@ const statIconPath = (icon: string) => {
   animation: heroTextSlideIn 0.75s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
+@keyframes heroCtaIntro {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 1.25rem, 0) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes heroCtaIdle {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    box-shadow: 0 14px 32px -24px rgba(255, 255, 255, 0.45);
+  }
+  40% {
+    transform: translate3d(0, -0.18rem, 0) scale(1.015);
+    box-shadow: 0 22px 38px -20px rgba(255, 255, 255, 0.55);
+  }
+  70% {
+    transform: translate3d(0, -0.08rem, 0) scale(1.008);
+    box-shadow: 0 18px 34px -22px rgba(255, 255, 255, 0.5);
+  }
+}
+
+@keyframes heroCtaShimmer {
+  0% {
+    transform: translateX(-120%);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+}
+
+.hero-cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: inherit;
+  overflow: hidden;
+  transform: translateZ(0);
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    background-color 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.hero-cta::after {
+  content: '';
+  position: absolute;
+  inset: -40%;
+  transform: rotate(25deg);
+  opacity: 0;
+  transform: translateX(-120%);
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.hero-cta--primary::after {
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.45) 50%, rgba(255, 255, 255, 0) 100%);
+}
+
+.hero-cta--secondary::after {
+  background: linear-gradient(120deg, rgba(129, 140, 248, 0) 0%, rgba(129, 140, 248, 0.45) 45%, rgba(129, 140, 248, 0) 100%);
+}
+
+.hero-cta--intro {
+  opacity: 0;
+  transform: translate3d(0, 1.25rem, 0) scale(0.96);
+  animation:
+    heroCtaIntro 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards,
+    heroCtaIdle 7.5s ease-in-out 1.1s infinite;
+}
+
+.hero-cta:hover,
+.hero-cta:focus-visible {
+  transform: translate3d(0, -0.2rem, 0);
+  box-shadow: 0 20px 35px -25px rgba(255, 255, 255, 0.55);
+  animation-play-state: paused;
+}
+
+.hero-cta:hover::after,
+.hero-cta:focus-visible::after {
+  opacity: 1;
+  animation: heroCtaShimmer 0.75s ease forwards;
+}
+
+.hero-cta:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.55);
+  outline-offset: 2px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hero-text-enter {
     animation: none !important;
+  }
+
+  .hero-cta {
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .hero-cta::after,
+  .hero-cta--intro {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
   }
 
   .animate-heroPulse,
@@ -405,6 +531,3 @@ const statIconPath = (icon: string) => {
   animation: heroPulseDelay 24s ease-in-out infinite;
 }
 </style>
-
-
-

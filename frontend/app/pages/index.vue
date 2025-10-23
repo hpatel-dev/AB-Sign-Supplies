@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { useIntersectionObserver, useMediaQuery } from '@vueuse/core';
 import { useCompanyInfo } from '~/composables/useCompanyInfo';
 
 interface Product {
@@ -32,6 +33,7 @@ const { apply: applySeo } = useSeo({ slug: 'home' });
 const companyInfo = useCompanyInfo();
 const runtimeConfig = useRuntimeConfig();
 const requestUrl = useRequestURL();
+const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)', { initialValue: false });
 
 const siteOrigin = computed(() => {
   const configured = typeof runtimeConfig.public?.siteUrl === 'string'
@@ -233,6 +235,72 @@ watch(
   },
   { immediate: true },
 );
+
+const capabilitiesSection = ref<HTMLElement | null>(null);
+const capabilityCardElements = new Set<HTMLElement>();
+let stopCapabilitiesObserver: (() => void) | undefined;
+
+const registerCapabilityCard = (el: Element | null) => {
+  if (!process.client || !el) {
+    return;
+  }
+
+  const node = el as HTMLElement;
+  capabilityCardElements.add(node);
+};
+
+onMounted(() => {
+  if (prefersReducedMotion.value) {
+    return;
+  }
+
+  const hasAnimateSupport = typeof window !== 'undefined' && typeof window.document !== 'undefined';
+
+  if (!hasAnimateSupport) {
+    return;
+  }
+
+  const observer = useIntersectionObserver(
+    capabilitiesSection,
+    (entries) => {
+      const [entry] = entries;
+
+      if (!entry || !entry.isIntersecting) {
+        return;
+      }
+
+      Array.from(capabilityCardElements).forEach((card, index) => {
+        if (typeof card.animate !== 'function') {
+          return;
+        }
+
+        card.animate(
+          [
+            { opacity: 0, transform: 'translate3d(0, 2rem, 0)' },
+            { opacity: 1, transform: 'translate3d(0, 0, 0)' },
+          ],
+          {
+            duration: 700,
+            delay: index * 120,
+            easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+            fill: 'forwards',
+          },
+        );
+      });
+
+      observer.stop();
+      stopCapabilitiesObserver = undefined;
+    },
+    { threshold: 0.25 },
+  );
+
+  stopCapabilitiesObserver = observer.stop;
+});
+
+onBeforeUnmount(() => {
+  stopCapabilitiesObserver?.();
+  capabilityCardElements.clear();
+});
 </script>
 
 <template>
@@ -240,7 +308,7 @@ watch(
     <HeroBanner />
 
     <section class="relative bg-white py-20">
-      <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary via-dark to-primary" />
+      <div class="animated-gradient-bar absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary via-dark to-primary" />
       <div class="mx-auto w-full max-w-7xl px-6">
         <SectionHeading title="Featured Products" subtitle="Curated by our specialists" />
 
@@ -282,24 +350,33 @@ watch(
           </div>
         </div>
       </div>
-      <div class="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-primary via-dark to-primary" />
+      <div class="animated-gradient-bar absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-primary via-dark to-primary" />
     </section>
 
-    <section class="bg-secondary">
+    <section class="bg-secondary" ref="capabilitiesSection">
       <div class="mx-auto grid w-full max-w-7xl gap-12 px-6 py-20 lg:grid-cols-3">
-        <div class="rounded-xl border border-primary/30 bg-white p-8 shadow-lg shadow-primary/10">
+        <div
+          class="rounded-xl border border-primary/30 bg-white p-8 shadow-lg shadow-primary/10"
+          :ref="registerCapabilityCard"
+        >
           <h3 class="text-xl font-semibold text-secondary">Premium Materials</h3>
           <p class="mt-3 text-secondary/70">
             From vinyl and acrylics to electrical components, we source reliable materials from trusted brands.
           </p>
         </div>
-        <div class="rounded-xl border border-primary/30 bg-white p-8 shadow-lg shadow-primary/10">
+        <div
+          class="rounded-xl border border-primary/30 bg-white p-8 shadow-lg shadow-primary/10"
+          :ref="registerCapabilityCard"
+        >
           <h3 class="text-xl font-semibold text-secondary">Industry Expertise</h3>
           <p class="mt-3 text-secondary/70">
             Lean on our specialists for product recommendations and installation best practices for any project.
           </p>
         </div>
-        <div class="rounded-xl border border-primary/30 bg-white p-8 shadow-lg shadow-primary/10">
+        <div
+          class="rounded-xl border border-primary/30 bg-white p-8 shadow-lg shadow-primary/10"
+          :ref="registerCapabilityCard"
+        >
           <h3 class="text-xl font-semibold text-secondary">Rapid Fulfillment</h3>
           <p class="mt-3 text-secondary/70">
             Nationwide distribution centers and dedicated logistics ensure you meet tight production schedules.
@@ -310,6 +387,30 @@ watch(
   </div>
 </template>
 
+<style scoped>
+@keyframes gradientBarSlide {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animated-gradient-bar {
+  background-size: 200% 100%;
+  animation: gradientBarSlide 8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animated-gradient-bar {
+    animation: none !important;
+  }
+}
+</style>
 
 
 
